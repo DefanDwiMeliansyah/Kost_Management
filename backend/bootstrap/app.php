@@ -49,6 +49,10 @@ $app->routeMiddleware([
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(PHPOpenSourceSaver\JWTAuth\Providers\LumenServiceProvider::class);
 
+// Register Migration CLI
+$app->register(Illuminate\Database\DatabaseServiceProvider::class);
+$app->register(Illuminate\Database\MigrationServiceProvider::class);
+
 // Load Routes
 $app->router->group([
     'namespace' => 'App\Http\Controllers',

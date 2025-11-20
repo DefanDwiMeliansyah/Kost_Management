@@ -21,3 +21,13 @@ $router->group(['prefix' => 'api/auth', 'middleware' => 'auth'], function () use
     $router->get('me', 'AuthController@me');
     $router->post('refresh', 'AuthController@refresh');
 });
+
+// Rooms
+$router->group(['prefix' => 'api/rooms'], function () use ($router) {
+    $router->get('/', 'RoomController@index');
+    $router->post('/', 'RoomController@store');
+    $router->get('/statistics', 'RoomController@statistics');
+    $router->get('/{id}', 'RoomController@show');
+    $router->put('/{id}', 'RoomController@update');
+    $router->delete('/{id}', 'RoomController@destroy');
+});

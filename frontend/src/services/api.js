@@ -53,4 +53,29 @@ export default {
   getCurrentUser() {
     return api.get('/auth/me');
   },
+
+  // Rooms endpoints
+  getRooms(params) {
+    return api.get('/rooms', { params });
+  },
+
+  getRoom(id) {
+    return api.get(`/rooms/${id}`);
+  },
+
+  createRoom(data) {
+    return api.post('/rooms', data);
+  },
+
+  updateRoom(id, data) {
+    return api.put(`/rooms/${id}`, data);
+  },
+
+  deleteRoom(id) {
+    return api.delete(`/rooms/${id}`);
+  },
+
+  getRoomStatistics() {
+    return api.get('/rooms/statistics');
+  },
 };

@@ -1,71 +1,16 @@
 <template>
   <div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">Kost Management</a>
+    <!-- Navbar Component -->
+    <Navbar />
 
-        <!-- Toggler -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <!-- ===========================
-             DESKTOP VERSION (DROPDOWN)
-            ============================ -->
-            <li class="nav-item dropdown d-none d-lg-block">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="userDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                {{ user?.name }}
-              </a>
-
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li>
-                  <a class="dropdown-item" href="#" @click.prevent="handleLogout"> Logout </a>
-                </li>
-              </ul>
-            </li>
-
-            <!-- ===========================
-              MOBILE VERSION (NO DROPDOWN)
-            ============================ -->
-            <li class="nav-item d-lg-none">
-              <a class="nav-link fw-bold disabled text-white">
-                {{ user?.name }}
-              </a>
-            </li>
-
-            <li class="nav-item d-lg-none">
-              <a class="nav-link" href="#">Profile</a>
-            </li>
-
-            <li class="nav-item d-lg-none">
-              <a class="nav-link" href="#" @click.prevent="handleLogout"> Logout </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
+    <!-- Main Content -->
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
           <div class="card shadow">
             <div class="card-body p-5">
               <h2 class="mb-4">Dashboard</h2>
+              
               <div class="alert alert-success" role="alert">
                 <h5 class="alert-heading">Selamat datang, {{ user?.name }}!</h5>
                 <p class="mb-0">
@@ -73,12 +18,13 @@
                 </p>
               </div>
 
+              <!-- Statistics Cards -->
               <div class="row mt-4">
                 <div class="col-md-4 mb-3">
                   <div class="card bg-primary text-white">
                     <div class="card-body">
                       <h5 class="card-title">Total Kamar</h5>
-                      <h2>0</h2>
+                      <h2 class="mb-0">{{ statistics.total }}</h2>
                     </div>
                   </div>
                 </div>
@@ -86,7 +32,7 @@
                   <div class="card bg-success text-white">
                     <div class="card-body">
                       <h5 class="card-title">Kamar Terisi</h5>
-                      <h2>0</h2>
+                      <h2 class="mb-0">{{ statistics.occupied }}</h2>
                     </div>
                   </div>
                 </div>
@@ -94,8 +40,26 @@
                   <div class="card bg-warning text-white">
                     <div class="card-body">
                       <h5 class="card-title">Kamar Kosong</h5>
-                      <h2>0</h2>
+                      <h2 class="mb-0">{{ statistics.available }}</h2>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="row mt-4">
+                <div class="col-12">
+                  <h5 class="mb-3">Quick Actions</h5>
+                  <div class="d-flex gap-2">
+                    <router-link to="/rooms" class="btn btn-primary">
+                      <i class="bi bi-door-open"></i> Kelola Kamar
+                    </router-link>
+                    <button class="btn btn-outline-primary" disabled>
+                      <i class="bi bi-people"></i> Kelola Penghuni
+                    </button>
+                    <button class="btn btn-outline-primary" disabled>
+                      <i class="bi bi-cash-stack"></i> Pembayaran
+                    </button>
                   </div>
                 </div>
               </div>
@@ -108,43 +72,61 @@
 </template>
 
 <script>
-import api from '@/services/api'
+import Navbar from '@/components/layouts/Navbar.vue';
+import api from '@/services/api';
 
 export default {
   name: 'Dashboard',
+  components: {
+    Navbar
+  },
   data() {
     return {
       user: null,
-    }
+      statistics: {
+        total: 0,
+        available: 0,
+        occupied: 0,
+        maintenance: 0
+      }
+    };
   },
   mounted() {
-    this.loadUser()
+    this.loadUser();
+    this.loadStatistics();
   },
   methods: {
     loadUser() {
-      const userData = localStorage.getItem('user')
+      const userData = localStorage.getItem('user');
       if (userData) {
-        this.user = JSON.parse(userData)
+        try {
+          this.user = JSON.parse(userData);
+        } catch (error) {
+          console.error('Failed to parse user data:', error);
+        }
       }
     },
-    async handleLogout() {
+    async loadStatistics() {
       try {
-        await api.logout()
+        const response = await api.getRoomStatistics();
+        if (response.data.success) {
+          this.statistics = response.data.data;
+        }
       } catch (error) {
-        console.error('Logout error:', error)
-      } finally {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        this.$router.push('/login')
+        console.error('Failed to load statistics:', error);
       }
-    },
-  },
-}
+    }
+  }
+};
 </script>
 
 <style scoped>
 .card {
   border: none;
   border-radius: 10px;
+}
+
+.gap-2 {
+  gap: 0.5rem;
 }
 </style>
