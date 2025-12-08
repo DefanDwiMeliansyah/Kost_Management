@@ -1,5 +1,5 @@
 <template>
-  <div class="modal fade" :id="modalId" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" :id="modalId" ref="roomModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import api from '@/services/api'
+import roomService from '@/services/roomService'
 import { Modal } from 'bootstrap'
 
 export default {
@@ -224,9 +224,9 @@ export default {
         let response
 
         if (this.isEdit) {
-          response = await api.updateRoom(this.roomData.id, this.form)
+          response = await roomService.update(this.roomData.id, this.form)
         } else {
-          response = await api.createRoom(this.form)
+          response = await roomService.create(this.form)
         }
 
         if (response.data.success) {
@@ -245,7 +245,12 @@ export default {
       }
     },
     closeModal() {
-      if (this.modalInstance) {
+      const modalElement = this.$refs.roomModal
+      const existingModal = Modal.getInstance(modalElement)
+
+      if (existingModal) {
+        existingModal.hide()
+      } else if (this.modalInstance) {
         this.modalInstance.hide()
       }
     },

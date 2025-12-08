@@ -1,3 +1,5 @@
+// services/api.js
+// Base API configuration dengan interceptors
 import axios from 'axios';
 
 const api = axios.create({
@@ -7,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
+// Request interceptor - Auto attach JWT token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -21,13 +23,14 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor - Handle 401 errors globally
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response && error.response.status === 401) {
+      // Auto logout on unauthorized
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
@@ -36,46 +39,4 @@ api.interceptors.response.use(
   }
 );
 
-export default {
-  // Auth endpoints
-  register(data) {
-    return api.post('/auth/register', data);
-  },
-  
-  login(data) {
-    return api.post('/auth/login', data);
-  },
-  
-  logout() {
-    return api.post('/auth/logout');
-  },
-  
-  getCurrentUser() {
-    return api.get('/auth/me');
-  },
-
-  // Rooms endpoints
-  getRooms(params) {
-    return api.get('/rooms', { params });
-  },
-
-  getRoom(id) {
-    return api.get(`/rooms/${id}`);
-  },
-
-  createRoom(data) {
-    return api.post('/rooms', data);
-  },
-
-  updateRoom(id, data) {
-    return api.put(`/rooms/${id}`, data);
-  },
-
-  deleteRoom(id) {
-    return api.delete(`/rooms/${id}`);
-  },
-
-  getRoomStatistics() {
-    return api.get('/rooms/statistics');
-  },
-};
+export default api;

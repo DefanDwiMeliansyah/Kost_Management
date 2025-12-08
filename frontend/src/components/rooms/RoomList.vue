@@ -133,7 +133,8 @@
 </template>
 
 <script>
-import api from '@/services/api';
+// RoomList.vue - <script> section
+import roomService from '@/services/roomService';
 import RoomForm from './RoomForm.vue';
 import { Modal } from 'bootstrap';
 
@@ -183,7 +184,7 @@ export default {
     async loadRooms() {
       this.loading = true;
       try {
-        const response = await api.getRooms(this.filters);
+        const response = await roomService.getAll(this.filters);
         
         if (response.data.success) {
           this.rooms = response.data.data.data;
@@ -227,8 +228,7 @@ export default {
     async confirmDelete(room) {
       if (confirm(`Apakah Anda yakin ingin menghapus kamar ${room.room_number}?`)) {
         try {
-          const response = await api.deleteRoom(room.id);
-          
+          const response = await roomService.delete(room.id);
           if (response.data.success) {
             alert('Kamar berhasil dihapus');
             this.loadRooms();

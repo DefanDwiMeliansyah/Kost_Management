@@ -1,61 +1,39 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '@/components/auth/Login.vue'
-import Register from '@/components/auth/Register.vue'
-import Dashboard from '@/views/Dashboard.vue'
-import RoomsManagement from '@/views/RoomsManagement.vue'
-import Navbar from '@/components/layouts/Navbar.vue'
+
+// Import route modules
+import authRoutes from './modules/auth'
+import dashboardRoutes from './modules/dashboard'
+import roomRoutes from './modules/rooms'
+import tenantRoutes from './modules/tenants'
+
+const routes = [
+  {
+    path: '/',
+    redirect: '/login'
+  },
+  // Spread all module routes
+  ...authRoutes,
+  ...dashboardRoutes,
+  ...roomRoutes,
+  ...tenantRoutes,
+  // 404 Not Found
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFound.vue'),
+    meta: { title: '404 Not Found' }
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      redirect: '/login'
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login,
-      meta: { guest: true }
-    },
-    {
-      path: '/register',
-      name: 'Register',
-      component: Register,
-      meta: { guest: true }
-    },
-    {
-      path: '/dashboard',
-      name: 'Dashboard',
-      component: Dashboard,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/rooms',
-      name: 'Rooms',
-      component: RoomsManagement,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/layouts',
-      name: 'Navbar',
-      component: Navbar,
-      meta: { requiresAuth: true }
+  routes,
+  // Smooth scroll behavior
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0, behavior: 'smooth' }
     }
-  ]
-})
-
-// Navigation guard
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  
-  if (to.meta.requiresAuth && !token) {
-    next('/login')
-  } else if (to.meta.guest && token) {
-    next('/dashboard')
-  } else {
-    next()
   }
 })
-
-export default router

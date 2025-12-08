@@ -31,3 +31,15 @@ $router->group(['prefix' => 'api/rooms'], function () use ($router) {
     $router->put('/{id}', 'RoomController@update');
     $router->delete('/{id}', 'RoomController@destroy');
 });
+
+// Tenants
+$router->group(['prefix' => 'api/tenants'], function () use ($router) {
+    $router->get('/', 'TenantController@index');
+    $router->post('/', 'TenantController@store');
+    $router->get('/statistics', 'TenantController@statistics');
+    $router->get('/expiring-soon', 'TenantController@expiringSoon');
+    $router->get('/{id}', 'TenantController@show');
+    $router->put('/{id}', 'TenantController@update');
+    $router->post('/{id}', 'TenantController@update');
+    $router->delete('/{id}', 'TenantController@destroy');
+});

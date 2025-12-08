@@ -27,7 +27,7 @@
   </div>
 </template>
 <script>
-import api from '@/services/api'
+import roomService from '@/services/roomService'
 
 export default {
   name: 'DashboardStatistics',
@@ -47,7 +47,7 @@ export default {
   methods: {
     async loadStatistics() {
       try {
-        const response = await api.getRoomStatistics()
+        const response = await roomService.getStatistics()
         if (response.data.success) {
           this.statistics = response.data.data
         }
